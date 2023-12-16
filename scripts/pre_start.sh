@@ -38,12 +38,20 @@ else
     echo "Starting LLaVA using model: ${LLAVA_MODEL}"
     /start_controller.sh
     /start_model_worker.sh
-    /start_webserver.sh
+    if [ "$ENABLE_WEBSERVER" = "true" ]; then
+      echo "Starting Webserver"
+      /start_webserver.sh
+    fi
+    if [ "$ENABLE_OPENAI_API" = "true" ]; then
+      echo "Starting OpenAI API"
+      /start_openai_api.sh
+    fi
     echo "LLaVA started"
     echo "Log files: "
     echo "   - Controller:   /workspace/logs/controller.log"
     echo "   - Model Worker: /workspace/logs/model-worker.log"
     echo "   - Webserver:    /workspace/logs/webserver.log"
+    echo "   - OpenAI Api:    /workspace/logs/openai-api.log"
 fi
 
 echo "All services have been started"
