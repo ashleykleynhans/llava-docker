@@ -99,6 +99,13 @@ RUN wget https://github.com/runpod/runpodctl/releases/download/v1.10.0/runpodctl
     chmod a+x runpodctl && \
     mv runpodctl /usr/local/bin
 
+# Install OpenAI API libraries
+RUN source /venv/bin/activate && \
+    pip3 install tiktoken && \
+    pip3 install fschat && \
+    pip3 install pydantic-settings && \
+    deactivate
+
 # Remove existing SSH host keys
 RUN rm -f /etc/ssh/ssh_host_*
 
