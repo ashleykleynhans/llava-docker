@@ -34,7 +34,58 @@ docker run -d \
   -p 3000:3001 \
   -p 8888:8888 \
   -e JUPYTER_PASSWORD=Jup1t3R! \
-  ashleykza/llava:latest
+  tdilber/llava:latest
+```
+```bash
+docker run -d \
+  --gpus all \
+  -v /workspace \
+  -p 3000:3001 \
+  -p 8080:8080 \
+  -p 8888:8888 \
+  -e JUPYTER_PASSWORD=Jup1t3R! \
+  -e ENABLE_WEBSERVER=true \
+  -e ENABLE_OPENAI_API=true \
+  -e OPENAI_API_PORT=8080 \
+  tdilber/llava:latest
+```
+
+```bash
+docker run -d \
+  --gpus all \
+  -v /workspace \
+  -p 3000:3001 \
+  -p 8080:8080 \
+  -e ENABLE_WEBSERVER=true \
+  -e ENABLE_OPENAI_API=true \
+  -e OPENAI_API_PORT=8080 \
+  tdilber/llava:latest
+```
+
+For OpenAi API Security Keys (separate with comma)
+```bash
+docker run -d \
+ ....
+  -e OPENAI_API_KEYS=key1,key2,key3 \
+  ...
+  tdilber/llava:latest
+```
+For Different Model 
+```bash
+docker run -d \
+ ....
+  -e MODEL="liuhaotian/llava-v1.5-7b" \
+  ...
+  tdilber/llava:latest
+```
+
+For Different Model With Bit Parameter (Or Different Llava Parameter)
+```bash
+docker run -d \
+ ....
+  -e MODEL="liuhaotian/llava-v1.5-7b --load-4bit" \
+  ...
+  tdilber/llava:latest
 ```
 
 You can obviously substitute the image name and tag with your own.
@@ -56,34 +107,84 @@ variable is not set, the model will default to `SkunkworksAI/BakLLaVA-1`.
 | [llava-v1.5-7b](https://huggingface.co/liuhaotian/llava-v1.5-7b)   | liuhaotian/llava-v1.5-7b    | no      |
 | [BakLLaVA-1](https://huggingface.co/SkunkworksAI/BakLLaVA-1)       | SkunkworksAI/BakLLaVA-1     | yes     |
 
+## Usage with OpenAI Python SDK:
 
-## Flask API
+The goal of `openai_api_server.py` is to implement a fully OpenAI-compatible API server, so the models can be used directly with [openai-python](https://github.com/openai/openai-python) library.
 
-### Add port 5000
-
-If you are running the RunPod template, edit your pod and add HTTP port 5000.
-
-If you are running locally, add a port mapping for port 5000.
-
-### Starting the Flask API
-
+First, install openai-python:
 ```bash
-# Stop model worker and controller to free up VRAM
-fuser -k 10000/tcp 40000/tcp
-
-# Install dependencies
-source /workspace/venv/bin/activate
-pip3 install flask protobuf
-cd /workspace/LLaVA
-export HF_HOME="/workspace"
-python -m llava.serve.api -H 0.0.0.0 -p 5000
+pip install --upgrade openai
 ```
 
-### Sending requests to the Flask API
+Then, interact with model vicuna:
+```python
+from openai import OpenAI
 
-You can use the [test script](
-https://github.com/ashleykleynhans/LLaVA/blob/main/llava/serve/test_api.py)
-to test your API.
+api_key = ""
+
+# Controller endpoint
+base_url = "http://localhost:8000/api/v1"
+
+
+client = OpenAI(
+    api_key=api_key,
+    base_url=base_url
+)
+
+response = client.chat.completions.create(
+  model="llava-v1.5-7b",
+  messages=[
+    {
+      "role": "user",
+      "content": [
+        {"type": "text", "text": "What’s in this image?"},
+        {
+          "type": "image_url",
+          "image_url": {
+            "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Gfp-wisconsin-madison-the-nature-boardwalk.jpg/2560px-Gfp-wisconsin-madison-the-nature-boardwalk.jpg",
+          },
+        },
+      ],
+    }
+  ],
+  max_tokens=300,
+  stream=False
+)
+
+print(response.choices[0])
+```
+
+Or Simply 
+
+```shell
+curl http://localhost:8080/api/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $OPENAI_API_KEY" \
+  -d '{
+    "model": "llava-v1.5-7b",
+    "messages": [
+      {
+        "role": "user",
+        "content": [
+          {
+            "type": "text",
+            "text": "What’s in this image?"
+          },
+          {
+            "type": "image_url",
+            "image_url": {
+              "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Gfp-wisconsin-madison-the-nature-boardwalk.jpg/2560px-Gfp-wisconsin-madison-the-nature-boardwalk.jpg"
+            }
+          }
+        ]
+      }
+    ],
+    "max_tokens": 300
+  }'
+```
+
+reference: https://github.com/tsdocode/LLaVA/tree/feat/openai-api
+Thanks :)
 
 ## Acknowledgements
 
