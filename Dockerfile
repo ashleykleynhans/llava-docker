@@ -1,7 +1,7 @@
 # Stage 1: Base
 FROM nvidia/cuda:11.8.0-cudnn8-devel-ubuntu22.04 as base
 
-ARG LLAVA_COMMIT=9227eedf8b31a62b71900e67d54c891c5d1d6fef
+ARG LLAVA_COMMIT=982392846650a7759b74f9bd9919aa5b258d19f0
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 ENV DEBIAN_FRONTEND=noninteractive \
@@ -71,7 +71,7 @@ RUN source /venv/bin/activate && \
 
 # Clone the git repo of LLaVA and set version
 WORKDIR /
-RUN git clone https://github.com/ashleykleynhans/LLaVA.git && \
+RUN git clone https://github.com/tsdocode/LLaVA.git && \
     cd /LLaVA && \
     git checkout ${LLAVA_COMMIT}
 
@@ -98,6 +98,13 @@ RUN pip3 install -U --no-cache-dir jupyterlab \
 RUN wget https://github.com/runpod/runpodctl/releases/download/v1.10.0/runpodctl-linux-amd -O runpodctl && \
     chmod a+x runpodctl && \
     mv runpodctl /usr/local/bin
+
+# Install OpenAI API libraries
+RUN source /venv/bin/activate && \
+    pip3 install tiktoken && \
+    pip3 install fschat && \
+    pip3 install pydantic-settings && \
+    deactivate
 
 # Remove existing SSH host keys
 RUN rm -f /etc/ssh/ssh_host_*
