@@ -152,7 +152,7 @@ If you are running locally, add a port mapping for port 5000.
 fuser -k 10000/tcp 40000/tcp
 
 # Install dependencies
-source /workspace/venv/bin/activate
+source /workspace/venvs/llava/bin/activate
 pip3 install flask protobuf
 cd /workspace/LLaVA
 export HF_HOME="/workspace"
