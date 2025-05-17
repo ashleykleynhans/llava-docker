@@ -10,7 +10,7 @@
 ## Installs
 
 * Ubuntu 22.04 LTS
-* CUDA 12.4
+* CUDA 12.1
 * Python 3.10.12
 * [LLaVA](
   https://github.com/haotian-liu/llava) v1.2.0 (LLaVA 1.6)
