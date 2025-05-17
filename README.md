@@ -14,8 +14,8 @@
 * Python 3.10.12
 * [LLaVA](
   https://github.com/haotian-liu/llava) v1.2.0 (LLaVA 1.6)
-* Torch 2.6.0
-* xformers 0.0.29.post3
+* Torch 2.1.2
+* xformers 0.0.23.post1
 * [Jupyter Lab](https://github.com/jupyterlab/jupyterlab)
 * [code-server](https://github.com/coder/code-server)
 * [runpodctl](https://github.com/runpod/runpodctl)
