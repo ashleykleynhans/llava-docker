@@ -33,9 +33,10 @@ RUN source /venv/bin/activate && \
     pip3 install wheel && \
     pip3 install -e . && \
     pip3 install ninja && \
-    pip3 install flash-attn --no-build-isolation && \
+    pip3 install flash-attn==2.3.4 --no-build-isolation && \
     pip3 install transformers==4.37.2 && \
     pip3 install protobuf && \
+    pip3 install pydantic==2.8.0 fastapi==0.111.0 && \
     deactivate
 
 # Download the default model
